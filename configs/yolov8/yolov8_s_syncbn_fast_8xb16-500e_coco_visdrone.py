@@ -1,29 +1,33 @@
 _base_ = ['../_base_/default_runtime.py', '../_base_/det_p5_tta.py']
-
+_base_ = 'yolov8_s_syncbn_fast_8xb16-500e_coco.py'
 # ========================Frequently modified parameters======================
 # -----data related-----
-data_root = '/data/coco/'  # Root path of data
+data_root = './data/VisDrone/'  # Root path of data
 # Path of train annotation file
-train_ann_file = 'annotations/instances_train2017.json'
-train_data_prefix = 'train2017/'  # Prefix of train image path
+train_ann_file = 'annotations/train.json'
+train_data_prefix = 'train/images'  # Prefix of train image path
 # Path of val annotation file
-val_ann_file = 'annotations/instances_val2017.json'
-val_data_prefix = 'val2017/'  # Prefix of val image path
-
-num_classes = 80  # Number of classes for classification
+val_ann_file = 'annotations/val.json'
+val_data_prefix = 'val/images'  # Prefix of val image path
+ 
+class_name = ('pedestrian','people','bicycle','car','van','truck','tricycle','awning-tricycle','bus', 'motor')
+class_name = ('pedestrian','people','bicycle','car')
+num_classes = len(class_name)
+metainfo = dict(classes=class_name, palette=[(20, 220, 60)])
+#num_classes = 5  # Number of classes for classification
 # Batch size of a single GPU during training
-train_batch_size_per_gpu = 16
+train_batch_size_per_gpu = 12
 # Worker to pre-fetch data for each single GPU during training
-train_num_workers = 8
+train_num_workers = 4
 # persistent_workers must be False if num_workers is 0
 persistent_workers = True
 
 # -----train val related-----
 # Base learning rate for optim_wrapper. Corresponding to 8xb16=64 bs
 base_lr = 0.01
-max_epochs = 500  # Maximum training epochs
+max_epochs = 10  # Maximum training epochs
 # Disable mosaic augmentation for final 10 epochs (stage 2)
-close_mosaic_epochs = 10
+close_mosaic_epochs = 5
 
 model_test_cfg = dict(
     # The config of multi-label for multi-class prediction.
@@ -129,8 +133,7 @@ model = dict(
             reg_max=16,
             norm_cfg=norm_cfg,
             act_cfg=dict(type='ReLU', inplace=True),
-            featmap_strides=strides,
-            skip_dfl=False),
+            featmap_strides=strides ),
         prior_generator=dict(
             type='mmdet.MlvlPointGenerator', offset=0.5, strides=strides),
         bbox_coder=dict(type='DistancePointBBoxCoder'),
@@ -238,7 +241,7 @@ train_dataloader = dict(
     sampler=dict(type='DefaultSampler', shuffle=True),
     collate_fn=dict(type='yolov5_collate'),
     dataset=dict(
-        type=dataset_type,
+        type=dataset_type,metainfo=metainfo,
         data_root=data_root,
         ann_file=train_ann_file,
         data_prefix=dict(img=train_data_prefix),
@@ -268,7 +271,7 @@ val_dataloader = dict(
     drop_last=False,
     sampler=dict(type='DefaultSampler', shuffle=False),
     dataset=dict(
-        type=dataset_type,
+        type=dataset_type,metainfo=metainfo,
         data_root=data_root,
         test_mode=True,
         data_prefix=dict(img=val_data_prefix),

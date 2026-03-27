@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python tools/misc/extract_sub_visdrone.py data/VisDrone_car data/VisDrone_car/sub --classes car)"
+    ]
+  }
+}
