@@ -20,12 +20,12 @@ def main():
     cfg = Config.fromfile(config_path)
 
     # Set work directory
-    cfg.work_dir = './work_dirs/car10'
+    cfg.work_dir = './work_dirs/car11'
     os.makedirs(cfg.work_dir, exist_ok=True)
 
     # Load pretrained weights (COCO pretrained)
-    cfg.load_from = 'https://download.openmmlab.com/mmyolo/v0/yolov8/yolov8_s_syncbn_fast_8xb16-500e_coco/yolov8_s_syncbn_fast_8xb16-500e_coco_20230117_180101-5aa5f0f1.pth'
-
+    # cfg.load_from = 'https://download.openmmlab.com/mmyolo/v0/yolov8/yolov8_s_syncbn_fast_8xb16-500e_coco/yolov8_s_syncbn_fast_8xb16-500e_coco_20230117_180101-5aa5f0f1.pth'
+    load_from = './data/VisDrone_car/visDrone.pth'
     # ========== GPU CONFIGURATION ==========
     # Check CUDA availability
     cuda_available = torch.cuda.is_available()
